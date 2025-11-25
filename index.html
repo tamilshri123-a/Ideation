@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTrack - Measure. Decide. Sustain.</title>
+    <!-- Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-familyCCCCcc: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        
+        /* Smooth transitions for section switching */
+        .app-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .app-section.active {
+            display: block;
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Card Hover Effects */
+        .category-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .category-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Progress Bar Animation */
+        .progress-bar-fill {
+            transition: width 1s ease-out;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Mobile-First Header -->
+    <header class="bg-white shadow-sm z-10 flex-none">
+        <div class="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 text-emerald-600 font-bold text-xl">
+                <i class="fa-solid fa-leaf"></i> EcoTrack
+            </div>
+            <div id="user-score-badge" class="hidden bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full font-semibold">
+                0 kg CO₂
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto relative bg-gray-50">
+        <div class="max-w-md mx-auto min-h-full pb-20">
+
+            <!-- SCREEN 1: ONBOARDING -->
+            <section id="screen-onboarding" class="app-section active flex flex-col items-center justify-center h-full px-6 py-10 text-center">
+                <div class="bg-emerald-100 p-6 rounded-full mb-6 animate-bounce">
+                    <i class="fa-solid fa-earth-americas text-6xl text-emerald-600"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Measure Your Impact</h1>
+                <p class="text-gray-500 mb-8">Empower yourself to track your carbon footprint, make informed decisions, and live sustainably.</p>
+                
+                <div class="space-y-4 w-full">
+                    <div class="flex items-center gap-3 text-left bg-white p-3 rounded-lg shadow-sm">
+                        <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i class="fa-solid fa-chart-line"></i></div>
+                        <div><h3 class="font-semibold text-sm">Track</h3><p class="text-xs text-gray-400">Daily activities & emissions</p></div>
+                    </div>
+                    <div class="flex items-center gap-3 text-left bg-white p-3 rounded-lg shadow-sm">
+                        <div class="bg-orange-100 text-orange-600 p-2 rounded-lg"><i class="fa-solid fa-lightbulb"></i></div>
+                        <div><h3 class="font-semibold text-sm">Analyze</h3><p class="text-xs text-gray-400">Get personalized insights</p></div>
+                    </div>
+                </div>
+
+                <button onclick="navigateTo('screen-tracker')" class="mt-8 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg shadow-emerald-200">
+                    Start Your Journey
+                </button>
+            </section>
+
+            <!-- SCREEN 2: TRACKER / ACTIVITY SELECTION -->
+            <section id="screen-tracker" class="app-section px-4 py-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Log Activity</h2>
+                    <p class="text-sm text-gray-500">Select a category to add to your footprint.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Transport -->
+                    <button onclick="openInputModal('transport')" class="category-card bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center gap-3">
+                        <div class="bg-blue-50 text-blue-500 w-12 h-12 flex items-center justify-center rounded-full text-xl">
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <span class="font-semibold text-gray-700">Transport</span>
+                    </button>
+
+                    <!-- Food -->
+                    <button onclick="openInputModal('food')" class="category-card bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center gap-3">
+                        <div class="bg-red-50 text-red-500 w-12 h-12 flex items-center justify-center rounded-full text-xl">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+                        <span class="font-semibold text-gray-700">Food</span>
+                    </button>
+
+                    <!-- Energy -->
+                    <button onclick="openInputModal('energy')" class="category-card bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center gap-3">
+                        <div class="bg-yellow-50 text-yellow-500 w-12 h-12 flex items-center justify-center rounded-full text-xl">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <span class="font-semibold text-gray-700">Energy</span>
+                    </button>
+
+                    <!-- Shopping -->
+                    <button onclick="openInputModal('shopping')" class="category-card bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center gap-3">
+                        <div class="bg-purple-50 text-purple-500 w-12 h-12 flex items-center justify-center rounded-full text-xl">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                        </div>
+                        <span class="font-semibold text-gray-700">Shopping</span>
+                    </button>
+                </div>
+
+                <!-- Recent History Preview -->
+                <div class="mt-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3">Today's Logs</h3>
+                    <div id="logs-list" class="space-y-3">
+                        <!-- Logs injected via JS -->
+                        <div class="text-center text-gray-400 py-4 text-sm italic">No activities logged yet.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SCREEN 3: DASHBOARD -->
+            <section id="screen-dashboard" class="app-section px-4 py-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Analysis</h2>
+                <p class="text-sm text-gray-500 mb-6">Compare against your daily eco-target.</p>
+
+                <!-- Total Score Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-md border-l-4 border-emerald-500 mb-6 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <p class="text-gray-500 text-sm font-medium uppercase tracking-wide">Total Emissions</p>
+                        <h3 class="text-4xl font-bold text-gray-900 mt-1"><span id="total-emissions-display">0</span> <span class="text-lg text-gray-500 font-normal">kg CO₂</span></h3>
+                        <p class="text-sm mt-2 text-gray-500">Daily Goal: <span class="font-semibold text-gray-800">20 kg</span></p>
+                    </div>
+                    <!-- Background decoration -->
+                    <i class="fa-solid fa-cloud text-gray-50 absolute -right-4 -bottom-4 text-9xl z-0"></i>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="bg-white rounded-xl p-4 shadow-sm mb-6">
+                    <div class="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                        <span>Safe Zone</span>
+                        <span>Warning</span>
+                        <span>Critical</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div id="dashboard-progress" class="bg-emerald-500 h-4 rounded-full progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                    <p id="dashboard-status" class="text-center text-sm mt-2 text-emerald-600 font-medium">You are in the green zone!</p>
+                </div>
+
+                <!-- Category Breakdown -->
+                <h3 class="text-lg font-bold text-gray-800 mb-3">Breakdown</h3>
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                        <div class="text-xs text-gray-400">Transport</div>
+                        <div class="font-bold text-lg text-blue-600"><span id="stat-transport">0</span> kg</div>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                        <div class="text-xs text-gray-400">Food</div>
+                        <div class="font-bold text-lg text-red-600"><span id="stat-food">0</span> kg</div>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                        <div class="text-xs text-gray-400">Energy</div>
+                        <div class="font-bold text-lg text-yellow-600"><span id="stat-energy">0</span> kg</div>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                        <div class="text-xs text-gray-400">Shopping</div>
+                        <div class="font-bold text-lg text-purple-600"><span id="stat-shopping">0</span> kg</div>
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                <h3 class="text-lg font-bold text-gray-800 mb-3">Suggestions for You</h3>
+                <div id="suggestions-list" class="space-y-3">
+                    <!-- Suggestions injected via JS -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav id="bottom-nav" class="hidden bg-white border-t border-gray-200 fixed bottom-0 w-full z-20 max-w-md left-1/2 transform -translate-x-1/2">
+        <div class="flex justify-around items-center h-16">
+            <button onclick="navigateTo('screen-tracker')" class="nav-btn active flex flex-col items-center text-gray-400 hover:text-emerald-600 w-full">
+                <i class="fa-solid fa-plus-circle text-xl mb-1"></i>
+                <span class="text-xs font-medium">Track</span>
+            </button>
+            <button onclick="navigateTo('screen-dashboard')" class="nav-btn flex flex-col items-center text-gray-400 hover:text-emerald-600 w-full">
+                <i class="fa-solid fa-chart-pie text-xl mb-1"></i>
+                <span class="text-xs font-medium">Dashboard</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- INPUT MODAL OVERLAY -->
+    <div id="input-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-end justify-center sm:items-center">
+        <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 transform transition-transform duration-300">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-xl font-bold text-gray-900">Log Activity</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            
+            <form id="activity-form" onsubmit="submitActivity(event)">
+                <input type="hidden" id="modal-category">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Activity Type</label>
+                    <select id="modal-select" class="w-full border-gray-300 bg-gray-50 border rounded-lg p-3 text-gray-700 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2" id="modal-unit-label">Amount</label>
+                    <div class="flex items-center">
+                        <input type="number" id="modal-amount" step="0.1" required class="w-full border-gray-300 bg-gray-50 border rounded-lg p-3 text-gray-700 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="0">
+                        <span id="modal-unit-text" class="ml-3 text-gray-500 font-medium">km</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition">
+                    Add to Log
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA & CONFIG ---
+        const dailyTarget = 20.0; // kg CO2
+        
+        // Emission Factors (Approximate kg CO2e)
+        const emissionFactors = {
+            transport: {
+                car: { label: "Car Ride", factor: 0.19, unit: "km" }, // per km
+                bus: { label: "Bus/Transit", factor: 0.04, unit: "km" },
+                flight: { label: "Short Flight", factor: 0.25, unit: "km" }
+            },
+            food: {
+                beef: { label: "Red Meat Meal", factor: 7.0, unit: "serving" },
+                chicken: { label: "Poultry Meal", factor: 1.5, unit: "serving" },
+                vegan: { label: "Plant-Based Meal", factor: 0.5, unit: "serving" }
+            },
+            energy: {
+                electricity: { label: "Electricity Usage", factor: 0.5, unit: "kWh" },
+                gas: { label: "Natural Gas", factor: 2.0, unit: "m3" }
+            },
+            shopping: {
+                clothes: { label: "New Clothing", factor: 10.0, unit: "item" },
+                electronics: { label: "Small Electronics", factor: 20.0, unit: "item" }
+            }
+        };
+
+        // State
+        let logs = [];
+
+        // --- NAVIGATION ---
+        function navigateTo(screenId) {
+            // Hide all sections
+            document.querySelectorAll('.app-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            // Show target section
+            document.getElementById(screenId).classList.add('active');
+
+            // Handle Nav Bar visibility
+            const nav = document.getElementById('bottom-nav');
+            const badge = document.getElementById('user-score-badge');
+            
+            if(screenId === 'screen-onboarding') {
+                nav.classList.add('hidden');
+                badge.classList.add('hidden');
+            } else {
+                nav.classList.remove('hidden');
+                badge.classList.remove('hidden');
+            }
+
+            // Update Nav visual state
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-emerald-600');
+                btn.classList.add('text-gray-400');
+            });
+            if(screenId !== 'screen-onboarding') {
+                const activeBtnIndex = screenId === 'screen-tracker' ? 0 : 1;
+                document.querySelectorAll('.nav-btn')[activeBtnIndex].classList.add('text-emerald-600');
+                document.querySelectorAll('.nav-btn')[activeBtnIndex].classList.remove('text-gray-400');
+            }
+
+            if(screenId === 'screen-dashboard') {
+                updateDashboard();
+            }
+        }
+
+        // --- MODAL LOGIC ---
+        const modal = document.getElementById('input-modal');
+        const modalSelect = document.getElementById('modal-select');
+        const modalCategoryInput = document.getElementById('modal-category');
+        const modalUnitLabel = document.getElementById('modal-unit-text');
+
+        function openInputModal(category) {
+            modalCategoryInput.value = category;
+            
+            // Populate Dropdown
+            modalSelect.innerHTML = '';
+            const options = emissionFactors[category];
+            let firstUnit = "";
+            
+            for (const [key, details] of Object.entries(options)) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.text = details.label;
+                modalSelect.appendChild(option);
+                if (!firstUnit) firstUnit = details.unit;
+            }
+
+            // Set Title & Unit
+            document.getElementById('modal-title').innerText = `Log ${category.charAt(0).toUpperCase() + category.slice(1)}`;
+            modalUnitLabel.innerText = firstUnit;
+
+            // Show Modal
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('activity-form').reset();
+        }
+
+        // Update unit text when select changes
+        modalSelect.addEventListener('change', (e) => {
+            const category = modalCategoryInput.value;
+            const subType = e.target.value;
+            modalUnitLabel.innerText = emissionFactors[category][subType].unit;
+        });
+
+        // --- CORE LOGIC ---
+        function submitActivity(e) {
+            e.preventDefault();
+            
+            const category = modalCategoryInput.value;
+            const subType = modalSelect.value;
+            const amount = parseFloat(document.getElementById('modal-amount').value);
+
+            if (!amount || amount <= 0) return;
+
+            const factorData = emissionFactors[category][subType];
+            const carbonValue = amount * factorData.factor;
+
+            const newLog = {
+                id: Date.now(),
+                category: category,
+                subTypeLabel: factorData.label,
+                amount: amount,
+                unit: factorData.unit,
+                co2: carbonValue,
+                timestamp: new Date()
+            };
+
+            logs.unshift(newLog); // Add to beginning of array
+            
+            renderLogs();
+            updateTotalBadge();
+            closeModal();
+            
+            // Optional: Auto navigate to dashboard to show impact
+            // navigateTo('screen-dashboard'); 
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('logs-list');
+            container.innerHTML = '';
+
+            if (logs.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 py-4 text-sm italic">No activities logged yet.</div>';
+                return;
+            }
+
+            logs.slice(0, 5).forEach(log => {
+                let iconClass = '';
+                let colorClass = '';
+                
+                switch(log.category) {
+                    case 'transport': iconClass = 'fa-car'; colorClass = 'text-blue-500 bg-blue-50'; break;
+                    case 'food': iconClass = 'fa-utensils'; colorClass = 'text-red-500 bg-red-50'; break;
+                    case 'energy': iconClass = 'fa-bolt'; colorClass = 'text-yellow-500 bg-yellow-50'; break;
+                    case 'shopping': iconClass = 'fa-bag-shopping'; colorClass = 'text-purple-500 bg-purple-50'; break;
+                }
+
+                const html = `
+                    <div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-gray-100 animate-fadeIn">
+                        <div class="flex items-center gap-3">
+                            <div class="${colorClass} w-10 h-10 rounded-full flex items-center justify-center">
+                                <i class="fa-solid ${iconClass}"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800 text-sm">${log.subTypeLabel}</h4>
+                                <p class="text-xs text-gray-500">${log.amount} ${log.unit}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-gray-700 block text-sm">${log.co2.toFixed(1)} kg</span>
+                            <span class="text-xs text-gray-400">CO₂</span>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function updateTotalBadge() {
+            const total = logs.reduce((sum, log) => sum + log.co2, 0);
+            document.getElementById('user-score-badge').innerText = `${total.toFixed(1)} kg CO₂`;
+        }
+
+        function updateDashboard() {
+            // 1. Calculate Totals
+            const total = logs.reduce((sum, log) => sum + log.co2, 0);
+            const byCategory = { transport: 0, food: 0, energy: 0, shopping: 0 };
+            
+            logs.forEach(log => {
+                if (byCategory[log.category] !== undefined) {
+                    byCategory[log.category] += log.co2;
+                }
+            });
+
+            // 2. Update DOM Text
+            document.getElementById('total-emissions-display').innerText = total.toFixed(1);
+            
+            document.getElementById('stat-transport').innerText = byCategory.transport.toFixed(1);
+            document.getElementById('stat-food').innerText = byCategory.food.toFixed(1);
+            document.getElementById('stat-energy').innerText = byCategory.energy.toFixed(1);
+            document.getElementById('stat-shopping').innerText = byCategory.shopping.toFixed(1);
+
+            // 3. Progress Bar Logic
+            const percentage = Math.min((total / dailyTarget) * 100, 100);
+            const progressBar = document.getElementById('dashboard-progress');
+            const statusText = document.getElementById('dashboard-status');
+            
+            progressBar.style.width = `${percentage}%`;
+
+            if (percentage < 50) {
+                progressBar.className = 'progress-bar-fill h-4 rounded-full bg-emerald-500';
+                statusText.innerText = "Excellent! You are living sustainably.";
+                statusText.className = "text-center text-sm mt-2 text-emerald-600 font-medium";
+            } else if (percentage < 90) {
+                progressBar.className = 'progress-bar-fill h-4 rounded-full bg-yellow-500';
+                statusText.innerText = "Be careful, approaching daily limit.";
+                statusText.className = "text-center text-sm mt-2 text-yellow-600 font-medium";
+            } else {
+                progressBar.className = 'progress-bar-fill h-4 rounded-full bg-red-500';
+                statusText.innerText = "Action Needed! High Carbon Impact.";
+                statusText.className = "text-center text-sm mt-2 text-red-600 font-bold";
+            }
+
+            // 4. Generate Suggestions based on highest category
+            generateSuggestions(byCategory);
+        }
+
+        function generateSuggestions(byCategory) {
+            const list = document.getElementById('suggestions-list');
+            list.innerHTML = '';
+
+            // Find max category
+            let maxCat = Object.keys(byCategory).reduce((a, b) => byCategory[a] > byCategory[b] ? a : b);
+            
+            // If 0 usage
+            if (byCategory[maxCat] === 0) {
+                list.innerHTML = `<div class="bg-blue-50 text-blue-800 p-4 rounded-lg text-sm">Start logging activities to get personalized tips!</div>`;
+                return;
+            }
+
+            const tips = {
+                transport: [
+                    "Try carpooling or taking the bus for your next trip.",
+                    "Check tire pressure to improve fuel efficiency.",
+                    "Walk or cycle for short distances under 2km."
+                ],
+                food: [
+                    "Consider a 'Meatless Monday' to drop emissions significantly.",
+                    "Buy local produce to reduce transport emissions.",
+                    "Reduce food waste by meal planning."
+                ],
+                energy: [
+                    "Switch to LED bulbs if you haven't already.",
+                    "Unplug electronics when not in use (phantom power).",
+                    "Lower your thermostat by 1°C."
+                ],
+                shopping: [
+                    "Buy second-hand or vintage clothing.",
+                    "Choose products with minimal packaging.",
+                    "Repair electronics instead of replacing them immediately."
+                ]
+            };
+
+            const selectedTips = tips[maxCat];
+            selectedTips.forEach(tip => {
+                const item = `
+                    <div class="flex gap-3 items-start bg-white p-3 rounded-lg border border-gray-200">
+                        <i class="fa-solid fa-check-circle text-emerald-500 mt-1"></i>
+                        <p class="text-sm text-gray-700">${tip}</p>
+                    </div>
+                `;
+                list.innerHTML += item;
+            });
+        }
+
+        // Initialize
+        updateTotalBadge();
+    </script>
+</body>
+</html>
